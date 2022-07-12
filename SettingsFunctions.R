@@ -17,9 +17,9 @@ createCohortDiagnosticsModuleSpecifications <- function(runInclusionStatistics =
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "0.0.2",
+                         version = "0.0.9",
                          remoteRepo = "github.com",
-                         remoteUsername = "ohdsi",
+                         remoteUsername = "anthonysena",
                          settings = analysis)
   class(specifications) <- c("CohortDiagnosticsModuleSpecifications", "ModuleSpecifications")
   return(specifications)
