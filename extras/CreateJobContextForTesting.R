@@ -33,27 +33,33 @@ createCohortSharedResource <- function(cohortDefinitionSet) {
   return(sharedResource)
 }
 
+cohortDefinitionSet <- getSampleCohortDefintionSet()
+cohortDefinitionIds <- as.integer(unlist(lapply(cohortDefinitionSet, function (x) {x$cohortId})))
 analysisSpecifications <- createEmptyAnalysisSpecificiations() %>%
-  addSharedResources(createCohortSharedResource(getSampleCohortDefintionSet())) %>%
-  addModuleSpecifications(createCohortDiagnosticsModuleSpecifications(runInclusionStatistics = FALSE,
-                                                                      runIncludedSourceConcepts = FALSE,
-                                                                      runOrphanConcepts = FALSE,
-                                                                      runTimeSeries = FALSE,
-                                                                      runVisitContext = FALSE,
-                                                                      runBreakdownIndexEvents = FALSE,
-                                                                      runIncidenceRate = TRUE,
-                                                                      runCohortRelationship = FALSE,
-                                                                      runTemporalCohortCharacterization = FALSE,
-                                                                      incremental = FALSE))
+  addSharedResources(createCohortSharedResource(cohortDefinitionSet)) %>%
+  addModuleSpecifications(createCohortDiagnosticsModuleSpecifications(
+    cohortIds = cohortDefinitionIds,
+    runInclusionStatistics = FALSE, # Disable since this requires CG to create the cohort tables
+    runIncludedSourceConcepts = TRUE,
+    runOrphanConcepts = TRUE,
+    runTimeSeries = FALSE,
+    runVisitContext = TRUE,
+    runBreakdownIndexEvents = TRUE,
+    runIncidenceRate = TRUE,
+    runCohortRelationship = TRUE,
+    runTemporalCohortCharacterization = TRUE,
+    incremental = FALSE
+  )
+)
 
 # Module Settings Spec ----------------------------
-executionSettings <- Strategus::createExecutionSettings(connectionDetailsReference = "dummy",
-                                                        workDatabaseSchema = "main",
-                                                        cdmDatabaseSchema = "main",
-                                                        cohortTableNames = CohortGenerator::getCohortTableNames(cohortTable = "cohort"),
-                                                        workFolder = "dummy",
-                                                        resultsFolder = "dummy",
-                                                        minCellCount = 5)
+executionSettings <- Strategus::createCdmExecutionSettings(connectionDetailsReference = "dummy",
+                                                           workDatabaseSchema = "main",
+                                                           cdmDatabaseSchema = "main",
+                                                           cohortTableNames = CohortGenerator::getCohortTableNames(cohortTable = "cohort"),
+                                                           workFolder = "dummy",
+                                                           resultsFolder = "dummy",
+                                                           minCellCount = 5)
 
 # Job Context ----------------------------
 module <- "CohortDiagnosticsModule"
