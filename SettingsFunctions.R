@@ -10,7 +10,8 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
                                                         runIncidenceRate = TRUE,
                                                         runCohortRelationship = TRUE,
                                                         runTemporalCohortCharacterization = TRUE,
-                                                        temporalCovariateSettings = FeatureExtraction::createTemporalCovariateSettings(useDemographicsGender = TRUE,     useDemographicsAge = TRUE, useDemographicsAgeGroup = TRUE,     useDemographicsRace = TRUE, useDemographicsEthnicity = TRUE,     useDemographicsIndexYear = TRUE, useDemographicsIndexMonth = TRUE,     useDemographicsIndexYearMonth = TRUE, useDemographicsPriorObservationTime = TRUE,     useDemographicsPostObservationTime = TRUE, useDemographicsTimeInCohort = TRUE,     useConditionOccurrence = TRUE, useProcedureOccurrence = TRUE,     useDrugEraStart = TRUE, useMeasurement = TRUE, useConditionEraStart = TRUE,     useConditionEraOverlap = TRUE, useConditionEraGroupStart = FALSE,     useConditionEraGroupOverlap = TRUE, useDrugExposure = FALSE,     useDrugEraOverlap = FALSE, useDrugEraGroupStart = FALSE,     useDrugEraGroupOverlap = TRUE, useObservation = TRUE, useDeviceExposure = TRUE,     useCharlsonIndex = TRUE, useDcsi = TRUE, useChads2 = TRUE,     useChads2Vasc = TRUE, useHfrs = FALSE, temporalStartDays = c(-9999,         -365, -180, -30, -365, -30, 0, 1, 31, -9999), temporalEndDays = c(0,         0, 0, 0, -31, -1, 0, 30, 365, 9999)),
+                                                        temporalCovariateSettings = getDefaultCovariateSettings(),
+                                                        minCharacterizationMean = 0.01,
                                                         incremental = FALSE) {
   analysis <- list()
   for (name in names(formals(createCohortDiagnosticsModuleSpecifications))) {
@@ -18,7 +19,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "0.0.6",
+                         version = "0.0.7",
                          remoteRepo = "github.com",
                          remoteUsername = "ohdsi",
                          settings = analysis)
