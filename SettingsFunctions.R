@@ -21,7 +21,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   specifications <- list(module = "CohortDiagnosticsModule",
                          version = "v0.0.8",
                          remoteRepo = "github.com",
-                         remoteUsername = "ohdsi",
+                         remoteUsername = "azimov",
                          settings = analysis)
   class(specifications) <- c("CohortDiagnosticsModuleSpecifications", "ModuleSpecifications")
   return(specifications)
