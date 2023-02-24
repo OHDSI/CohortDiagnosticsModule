@@ -45,8 +45,6 @@ execute <- function(jobContext) {
   args$cohortIds <- jobContext$moduleExecutionSettings$cohortIds
   do.call(CohortDiagnostics::executeDiagnostics, args)
   
-  unlink(file.path(exportFolder, sprintf("Results_%s.zip", jobContext$moduleExecutionSettings$databaseId)))
-  
   moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
   resultsDataModel <- readr::read_csv(file = system.file("settings", "resultsDataModelSpecification.csv", package = "CohortDiagnostics"),
                                       show_col_types = FALSE)
@@ -87,4 +85,25 @@ createCohortDefinitionSetFromJobContext <- function(sharedResources) {
                                                                  stringsAsFactors = FALSE))    
   }
   return(cohortDefinitionSet)
+}
+
+
+uploadResultsCallback <- function(jobContext) {
+  connectionDetails <- jobContext$moduleExecutionSettings$resultsConnectionDetails
+  moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
+  tablePrefix <- moduleInfo$TablePrefix
+  schema <- jobContext$moduleExecutionSettings$resultsDatabaseSchema
+  zipFileName <- sprintf("Results_%s.zip", jobContext$moduleExecutionSettings$databaseId))
+  CohortDiagnostics::uploadResults(connectionDetails = connectionDetails, 
+                                   schema = schema,
+                                   tablePrefix = tablePrefix,
+                                   zipFileName = zipFileName)
+}
+
+createResultsSchemaCallback <- function(jobContext) {
+  connectionDetails <- jobContext$moduleExecutionSettings$resultsConnectionDetails
+  moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
+  tablePrefix <- moduleInfo$TablePrefix
+  databaseSchema <- jobContext$moduleExecutionSettings$resultsDatabaseSchema
+  CohortDiagnostics::createResultsDataModel(connectionDetails = connectionDetails, databaseSchema = databaseSchema, tablePrefix = tablePrefix)
 }
