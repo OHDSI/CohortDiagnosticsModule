@@ -19,7 +19,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "v0.0.8",
+                         version = "0.0.8",
                          remoteRepo = "github.com",
                          remoteUsername = "azimov",
                          settings = analysis)
