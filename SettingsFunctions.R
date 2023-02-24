@@ -10,7 +10,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
                                                         runIncidenceRate = TRUE,
                                                         runCohortRelationship = TRUE,
                                                         runTemporalCohortCharacterization = TRUE,
-                                                        temporalCovariateSettings = getDefaultCovariateSettings(),
+                                                        temporalCovariateSettings = CohortDiagnostics::getDefaultCovariateSettings(),
                                                         minCharacterizationMean = 0.01,
                                                         incremental = FALSE) {
   analysis <- list()
@@ -19,9 +19,9 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "0.0.7",
+                         version = "v0.0.8",
                          remoteRepo = "github.com",
-                         remoteUsername = "ohdsi",
+                         remoteUsername = "azimov",
                          settings = analysis)
   class(specifications) <- c("CohortDiagnosticsModuleSpecifications", "ModuleSpecifications")
   return(specifications)
