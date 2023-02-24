@@ -19,7 +19,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "0.0.8",
+                         version = "add-upload-callback-functionality",
                          remoteRepo = "github.com",
                          remoteUsername = "ohdsi",
                          settings = analysis)
