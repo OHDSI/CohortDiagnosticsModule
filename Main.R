@@ -44,18 +44,6 @@ execute <- function(jobContext) {
   args$minCellCount <- jobContext$moduleExecutionSettings$minCellCount
   args$cohortIds <- jobContext$moduleExecutionSettings$cohortIds
   do.call(CohortDiagnostics::executeDiagnostics, args)
-  
-  moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
-  resultsDataModel <- readr::read_csv(file = system.file("settings", "resultsDataModelSpecification.csv", package = "CohortDiagnostics"),
-                                      show_col_types = FALSE)
-  resultsDataModel <- resultsDataModel[file.exists(file.path(exportFolder, paste0(resultsDataModel$tableName, ".csv"))), ]
-  newTableNames <- paste0(moduleInfo$TablePrefix, resultsDataModel$tableName)
-  file.rename(file.path(exportFolder, paste0(unique(resultsDataModel$tableName), ".csv")),
-              file.path(exportFolder, paste0(unique(newTableNames), ".csv")))
-  resultsDataModel$tableName <- newTableNames
-  CohortGenerator::writeCsv(x = resultsDataModel, 
-                            file.path(exportFolder, "resultsDataModelSpecification.csv"),
-                            warnOnFileNameCaseMismatch = FALSE)
 }
 
 # Private methods -------------------------
@@ -100,7 +88,7 @@ uploadResultsCallback <- function(jobContext) {
                                    zipFileName = zipFileName)
 }
 
-createResultsSchemaCallback <- function(jobContext) {
+createDataModelSchema <- function(jobContext) {
   connectionDetails <- jobContext$moduleExecutionSettings$resultsConnectionDetails
   moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
   tablePrefix <- moduleInfo$TablePrefix
