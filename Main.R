@@ -81,7 +81,7 @@ uploadResultsCallback <- function(jobContext) {
   moduleInfo <- ParallelLogger::loadSettingsFromJson("MetaData.json")
   tablePrefix <- moduleInfo$TablePrefix
   schema <- jobContext$moduleExecutionSettings$resultsDatabaseSchema
-  zipFileName <- sprintf("Results_%s.zip", jobContext$moduleExecutionSettings$databaseId))
+  zipFileName <- sprintf("Results_%s.zip", jobContext$moduleExecutionSettings$databaseId)
   CohortDiagnostics::uploadResults(connectionDetails = connectionDetails, 
                                    schema = schema,
                                    tablePrefix = tablePrefix,
