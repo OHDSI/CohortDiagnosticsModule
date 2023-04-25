@@ -10,7 +10,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
                                                         runIncidenceRate = TRUE,
                                                         runCohortRelationship = TRUE,
                                                         runTemporalCohortCharacterization = TRUE,
-                                                        temporalCovariateSettings = getDefaultCovariateSettings(),
+                                                        temporalCovariateSettings = CohortDiagnostics::getDefaultCovariateSettings(),
                                                         minCharacterizationMean = 0.01,
                                                         incremental = FALSE) {
   analysis <- list()
