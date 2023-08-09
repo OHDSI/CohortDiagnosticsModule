@@ -80,7 +80,7 @@ createCohortDefinitionSetFromJobContext <- function(sharedResources) {
     cohortJson <- cohortDefinitions[[i]]$cohortDefinition
     cohortExpression <- CirceR::cohortExpressionFromJson(cohortJson)
     cohortSql <- CirceR::buildCohortQuery(cohortExpression, options = CirceR::createGenerateOptions(generateStats = FALSE))    
-    cohortDefinitionSet <- rbind(cohortDefinitionSet, data.frame(cohortId = as.integer(cohortDefinitions[[i]]$cohortId),
+    cohortDefinitionSet <- rbind(cohortDefinitionSet, data.frame(cohortId = as.numeric(cohortDefinitions[[i]]$cohortId),
                                                                  cohortName = cohortDefinitions[[i]]$cohortName, 
                                                                  sql = cohortSql,
                                                                  json = cohortJson,
