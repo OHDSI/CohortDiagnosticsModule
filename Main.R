@@ -101,6 +101,11 @@ createCohortDefinitionSetFromJobContext <- function(sharedResources) {
   return(cohortDefinitionSet)
 }
 
+getModuleInfo <- function() {
+  checkmate::assert_file_exists("MetaData.json")
+  return(ParallelLogger::loadSettingsFromJson("MetaData.json"))
+}
+
 
 uploadResultsCallback <- function(jobContext) {
   connectionDetails <- jobContext$moduleExecutionSettings$resultsConnectionDetails
