@@ -52,7 +52,19 @@ rCode[grep("return\\(analysis\\)", rCode)]  <- sprintf("
                          settings = analysis)
   class(specifications) <- c(\"CohortDiagnosticsModuleSpecifications\", \"ModuleSpecifications\")
   return(specifications)", moduleInfo$Name, moduleInfo$Version)
-writeLines(rCode, "SettingsFunctions.R")
+
+covariateSettings <- CohortDiagnostics::getDefaultCovariateSettings() |> ParallelLogger::convertSettingsToJson() 
+
+covariateSettingsExec <- sprintf('
+getDefaultCovariateSettings <- function() {
+  covariateSettings <- \'
+%s
+  \'
+  ParallelLogger::convertJsonToSettings(covariateSettings)
+}
+
+', covariateSettings)
+writeLines(c(covariateSettingsExec, rCode), "SettingsFunctions.R")
 
 
 # Generate renv lock file and activate renv:
