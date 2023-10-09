@@ -28,8 +28,11 @@ execute <- function(jobContext) {
   }
   
   message("Creating cohort definition set from job context")
-  cohortDefinitionSet <- createCohortDefinitionSetFromJobContext(sharedResources = jobContext$sharedResources)
-
+  cohortDefinitionSet <- createCohortDefinitionSetFromJobContext(
+    sharedResources = jobContext$sharedResources,
+    settings = jobContext$settings
+  )
+  
   message("Executing cohort diagnostics")
   exportFolder <- jobContext$moduleExecutionSettings$resultsSubFolder
   args <- jobContext$settings
@@ -73,17 +76,8 @@ execute <- function(jobContext) {
 }
 
 # Private methods -------------------------
-createCohortDefinitionSetFromJobContext <- function(sharedResources) {
-  cohortDefinitions <- list()
-  if (length(sharedResources) <= 0) {
-    stop("No shared resources found")
-  }
-  for (i in 1:length(sharedResources)) {
-    if (which(class(sharedResources[[i]]) %in% "CohortDefinitionSharedResources") > 0) {
-      cohortDefinitions <- sharedResources[[i]]$cohortDefinitions
-      break;
-    }
-  }
+.getCohortDefinitionSetFromSharedResource <- function(cohortDefinitionSharedResource, settings) {
+  cohortDefinitions <- cohortDefinitionSharedResource$cohortDefinitions
   if (length(cohortDefinitions) <= 0) {
     stop("No cohort definitions found")
   }
@@ -91,13 +85,54 @@ createCohortDefinitionSetFromJobContext <- function(sharedResources) {
   for (i in 1:length(cohortDefinitions)) {
     cohortJson <- cohortDefinitions[[i]]$cohortDefinition
     cohortExpression <- CirceR::cohortExpressionFromJson(cohortJson)
-    cohortSql <- CirceR::buildCohortQuery(cohortExpression, options = CirceR::createGenerateOptions(generateStats = FALSE))    
-    cohortDefinitionSet <- rbind(cohortDefinitionSet, data.frame(cohortId = as.numeric(cohortDefinitions[[i]]$cohortId),
-                                                                 cohortName = cohortDefinitions[[i]]$cohortName, 
-                                                                 sql = cohortSql,
-                                                                 json = cohortJson,
-                                                                 stringsAsFactors = FALSE))    
+    cohortSql <- CirceR::buildCohortQuery(cohortExpression, options = CirceR::createGenerateOptions(generateStats = settings$generateStats))
+    cohortDefinitionSet <- rbind(cohortDefinitionSet, data.frame(
+      cohortId = as.numeric(cohortDefinitions[[i]]$cohortId),
+      cohortName = cohortDefinitions[[i]]$cohortName,
+      sql = cohortSql,
+      json = cohortJson,
+      stringsAsFactors = FALSE
+    ))
   }
+  
+  if (length(cohortDefinitionSharedResource$subsetDefs)) {
+    subsetDefinitions <- lapply(cohortDefinitionSharedResource$subsetDefs, CohortGenerator::CohortSubsetDefinition$new)
+    for (subsetDef in subsetDefinitions) {
+      ind <- which(sapply(cohortDefinitionSharedResource$cohortSubsets, function(y) subsetDef$definitionId %in% y$subsetId))
+      targetCohortIds <- unlist(lapply(cohortDefinitionSharedResource$cohortSubsets[ind], function(y) y$targetCohortId))
+      cohortDefinitionSet <- CohortGenerator::addCohortSubsetDefinition(
+        cohortDefinitionSet = cohortDefinitionSet,
+        cohortSubsetDefintion = subsetDef,
+        targetCohortIds = targetCohortIds
+      )
+    }
+  }
+  
+  return(cohortDefinitionSet)
+}
+
+createCohortDefinitionSetFromJobContext <- function(sharedResources, settings) {
+  cohortDefinitions <- list()
+  if (length(sharedResources) <= 0) {
+    stop("No shared resources found")
+  }
+  cohortDefinitionSharedResource <- getSharedResourceByClassName(
+    sharedResources = sharedResources,
+    class = "CohortDefinitionSharedResources"
+  )
+  if (is.null(cohortDefinitionSharedResource)) {
+    stop("Cohort definition shared resource not found!")
+  }
+  
+  if ((is.null(cohortDefinitionSharedResource$subsetDefs) && !is.null(cohortDefinitionSharedResource$cohortSubsets)) ||
+      (!is.null(cohortDefinitionSharedResource$subsetDefs) && is.null(cohortDefinitionSharedResource$cohortSubsets))) {
+    stop("Cohort subset functionality requires specifying cohort subset definition & cohort subset identifiers.")
+  }
+  
+  cohortDefinitionSet <- .getCohortDefinitionSetFromSharedResource(
+    cohortDefinitionSharedResource = cohortDefinitionSharedResource,
+    settings = settings
+  )
   return(cohortDefinitionSet)
 }
 
