@@ -76,6 +76,16 @@ execute <- function(jobContext) {
 }
 
 # Private methods -------------------------
+getSharedResourceByClassName <- function(sharedResources, className) {
+  returnVal <- NULL
+  for (i in 1:length(sharedResources)) {
+    if (className %in% class(sharedResources[[i]])) {
+      returnVal <- sharedResources[[i]]
+      break
+    }
+  }
+  invisible(returnVal)
+}
 .getCohortDefinitionSetFromSharedResource <- function(cohortDefinitionSharedResource, settings) {
   cohortDefinitions <- cohortDefinitionSharedResource$cohortDefinitions
   if (length(cohortDefinitions) <= 0) {
@@ -85,7 +95,7 @@ execute <- function(jobContext) {
   for (i in 1:length(cohortDefinitions)) {
     cohortJson <- cohortDefinitions[[i]]$cohortDefinition
     cohortExpression <- CirceR::cohortExpressionFromJson(cohortJson)
-    cohortSql <- CirceR::buildCohortQuery(cohortExpression, options = CirceR::createGenerateOptions(generateStats = settings$generateStats))
+    cohortSql <- CirceR::buildCohortQuery(cohortExpression, options = CirceR::createGenerateOptions(generateStats = FALSE))
     cohortDefinitionSet <- rbind(cohortDefinitionSet, data.frame(
       cohortId = as.numeric(cohortDefinitions[[i]]$cohortId),
       cohortName = cohortDefinitions[[i]]$cohortName,
