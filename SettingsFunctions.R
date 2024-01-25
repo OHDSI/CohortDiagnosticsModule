@@ -58,7 +58,6 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
                                                         runTemporalCohortCharacterization = TRUE,
                                                         temporalCovariateSettings = getDefaultCovariateSettings(),
                                                         minCharacterizationMean = 0.01,
-                                                        irWashoutPeriod = 0,
                                                         incremental = FALSE) {
   analysis <- list()
   for (name in names(formals(createCohortDiagnosticsModuleSpecifications))) {
@@ -66,7 +65,7 @@ createCohortDiagnosticsModuleSpecifications <- function(cohortIds = NULL,
   }
 
   specifications <- list(module = "CohortDiagnosticsModule",
-                         version = "0.1.1-1",
+                         version = "0.1.2-1",
                          remoteRepo = "github.com",
                          remoteUsername = "ohdsi",
                          settings = analysis)
