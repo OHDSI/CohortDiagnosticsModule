@@ -18,12 +18,14 @@ getSampleCohortDefintionSet <- function() {
     cohortJsonFileName <- cohortJsonFiles[i]
     cohortName <- tools::file_path_sans_ext(basename(cohortJsonFileName))
     cohortJson <- readChar(cohortJsonFileName, file.info(cohortJsonFileName)$size)
-    sampleCohorts <- rbind(sampleCohorts, data.frame(cohortId = i,
-                                                     cohortName = cohortName,
-                                                     cohortDefinition = cohortJson,
-                                                     stringsAsFactors = FALSE))
+    sampleCohorts <- rbind(sampleCohorts, data.frame(
+      cohortId = i,
+      cohortName = cohortName,
+      cohortDefinition = cohortJson,
+      stringsAsFactors = FALSE
+    ))
   }
-  sampleCohorts <- apply(sampleCohorts,1,as.list)
+  sampleCohorts <- apply(sampleCohorts, 1, as.list)
   return(sampleCohorts)
 }
 
@@ -46,16 +48,20 @@ ParallelLogger::saveSettingsToJson(analysisSpecifications, "extras/test/testAnal
 connectionDetailsReference <- "Eunomia"
 connectionDetails <- Eunomia::getEunomiaConnectionDetails()
 
-Strategus::storeConnectionDetails(connectionDetails = connectionDetails,
-                                  connectionDetailsReference = connectionDetailsReference)
+Strategus::storeConnectionDetails(
+  connectionDetails = connectionDetails,
+  connectionDetailsReference = connectionDetailsReference
+)
 
-executionSettings <- Strategus::createExecutionSettings(connectionDetailsReference = connectionDetailsReference,
-                                                        workDatabaseSchema = "main",
-                                                        cdmDatabaseSchema = "main",
-                                                        cohortTableNames = CohortGenerator::getCohortTableNames(cohortTable = "strategus_test"),
-                                                        workFolder = file.path(getwd(), "extras/output/work"),
-                                                        resultsFolder = file.path(getwd(), "extras/output/results"),
-                                                        minCellCount = 5)
+executionSettings <- Strategus::createExecutionSettings(
+  connectionDetailsReference = connectionDetailsReference,
+  workDatabaseSchema = "main",
+  cdmDatabaseSchema = "main",
+  cohortTableNames = CohortGenerator::getCohortTableNames(cohortTable = "strategus_test"),
+  workFolder = file.path(getwd(), "extras/output/work"),
+  resultsFolder = file.path(getwd(), "extras/output/results"),
+  minCellCount = 5
+)
 
 ParallelLogger::saveSettingsToJson(executionSettings, "extras/test/testExecutionSettings.json")
 
@@ -66,8 +72,9 @@ moduleExecutionSettings <- executionSettings
 moduleExecutionSettings$workSubFolder <- file.path(executionSettings$workFolder, sprintf("%s_%d", module, moduleIndex))
 moduleExecutionSettings$resultsSubFolder <- file.path(executionSettings$resultsFolder, sprintf("%s_%d", module, moduleIndex))
 moduleExecutionSettings$databaseId <- 123
-jobContext <- list(sharedResources = analysisSpecifications$sharedResources,
-                   settings = analysisSpecifications$moduleSpecifications[[moduleIndex]]$settings,
-                   moduleExecutionSettings = moduleExecutionSettings)
+jobContext <- list(
+  sharedResources = analysisSpecifications$sharedResources,
+  settings = analysisSpecifications$moduleSpecifications[[moduleIndex]]$settings,
+  moduleExecutionSettings = moduleExecutionSettings
+)
 saveRDS(jobContext, "extras/test/jobContext.rds")
-
